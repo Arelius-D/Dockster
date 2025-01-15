@@ -4,13 +4,13 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     jq \
     cron \
     nginx \
     npm \
+    supervisor \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
@@ -30,7 +30,8 @@ RUN mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled && \
             autoindex on; \
         } \
     }' > /etc/nginx/sites-available/default && \
-    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+    [ ! -L /etc/nginx/sites-enabled/default ] && \
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/ || echo "Symbolic link already exists"
 
 # Copy scripts
 COPY scripts/healthcheck.sh /usr/local/bin/container_healthcheck.sh
