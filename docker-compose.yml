@@ -1,0 +1,30 @@
+services:
+    updater:
+    image: arelius-d/dockster:latest  # Pull the latest image from Docker Hub
+    container_name: dockster
+    environment:
+      PUID: 1000  # Default user ID on many Linux systems
+      PGID: 1000  # Default group ID on many Linux systems
+
+      # Set the following environment variables to "true" to enable respective commands:
+      ENABLE_UPDATE: "true"                  # Perform apt update
+      ENABLE_UPGRADE: "true"                 # Perform apt full-upgrade
+      ENABLE_AUTOREMOVE: "true"              # Remove unused packages
+      ENABLE_CLEAN: "true"                   # Clean package cache
+      ENABLE_DOCKER_CONTAINER_PRUNE: "true"  # Remove stopped Docker containers
+      ENABLE_DOCKER_IMAGE_PRUNE: "true"      # Remove unused Docker images
+      ENABLE_DOCKER_SYSTEM_PRUNE: "true"     # Perform full Docker cleanup (containers, images, volumes)
+      UPDATE_INTERVAL_HOURS: "8"             # Interval in hours for running the update script
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Allows the container to manage Docker on the host
+      # EXPLANATION: This line grants the container access to the Docker engine running on the host.
+      # It allows the updater to run commands like pruning Docker containers, images, and volumes on the host.
+
+    ports:
+      - 1010:1010  # Expose the web interface on port 1010
+    restart: unless-stopped
+
+    # Uncomment the following lines to use environment variables from a .env file:
+    # env_file:
+    #   - .env
