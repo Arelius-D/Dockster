@@ -1,17 +1,28 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "Dockster Frontend",
+  "private": true,
   "scripts": {
-    "build": "vue-cli-service build"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --no-clean --skip-plugins eslint",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "vue": "^2.7.16",
-    "vue-router": "^3.5.4",
-    "vuex": "^3.6.2",
-    "bootstrap": "^4.6.2",
-    "bootstrap-vue": "^2.21.2",
-    "axios": "^0.27.2",
-    "@vue/cli-service": "^5.0.8"
-  }
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.5.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.15.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }

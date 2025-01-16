@@ -1,6 +1,6 @@
 services:
-    updater:
-    image: arelius-d/dockster:latest  # Pull the latest image from Docker Hub
+  dockster:  # Service name
+    image: assarelius/dockster:latest  # Pull the latest image from Docker Hub
     container_name: dockster
     environment:
       PUID: 1000  # Default user ID on many Linux systems
@@ -17,12 +17,13 @@ services:
       UPDATE_INTERVAL_HOURS: "8"             # Interval in hours for running the update script
 
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # Allows the container to manage Docker on the host
-      # EXPLANATION: This line grants the container access to the Docker engine running on the host.
-      # It allows the updater to run commands like pruning Docker containers, images, and volumes on the host.
+      # Allow the container to perform system-level updates and manage Docker on the host
+      - /var/run/docker.sock:/var/run/docker.sock # Mount the Docker socket to the container
+      - ./backend/logs:/app/backend/logs  # Mount the logs directory to the host
 
     ports:
       - 1010:1010  # Expose the web interface on port 1010
+
     restart: unless-stopped
 
     # Uncomment the following lines to use environment variables from a .env file:

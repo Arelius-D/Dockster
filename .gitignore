@@ -1,0 +1,22 @@
+# Node.js dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+backend/static/
+
+# Logs
+*.log
+logs/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.local

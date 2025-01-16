@@ -1,10 +1,18 @@
 #!/bin/bash
-LOGFILE="/srv/logs/index.html"
+# Log paths
+LOGFILE="/srv/logs/update.log"
 ERRORFILE="/srv/logs/error.log"
 
-echo "Starting update script" >> $LOGFILE
-apt-get update >> $LOGFILE 2>> $ERRORFILE
-apt-get full-upgrade -y >> $LOGFILE 2>> $ERRORFILE
-apt-get autoremove --purge -y >> $LOGFILE 2>> $ERRORFILE
-apt-get clean >> $LOGFILE 2>> $ERRORFILE
-echo "Update script completed" >> $LOGFILE
+# Ensure log directory exists
+mkdir -p /srv/logs
+touch $LOGFILE $ERRORFILE
+
+# Start logging
+echo "Starting update script at $(date)" >> $LOGFILE
+{
+    apt-get update
+    apt-get full-upgrade -y
+    apt-get autoremove --purge -y
+    apt-get clean
+    echo "Update script completed at $(date)"
+} >> $LOGFILE 2>> $ERRORFILE
