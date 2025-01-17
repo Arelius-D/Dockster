@@ -2,15 +2,26 @@
   <div>
     <h1>Welcome to Dockster</h1>
     <nav>
-      <button @click="showLogs = !showLogs">
-        {{ showLogs ? "Hide Logs" : "View Logs" }}
+      <button @click="showDockerLogs = !showDockerLogs">
+        {{ showDockerLogs ? "Hide Docker Logs" : "Show Docker Logs" }}
       </button>
+      <button @click="showUpdateLogs = !showUpdateLogs">
+        {{ showUpdateLogs ? "Hide Update Logs" : "Show Update Logs" }}
+      </button>
+      <button @click="triggerCommand('apt-get update')">Run Update</button>
     </nav>
-    <div v-if="showLogs">
-      <h2>System Logs</h2>
-      <pre v-if="logs">{{ logs }}</pre>
-      <p v-else>Loading logs...</p>
-    </div>
+
+    <section v-if="showDockerLogs">
+      <h2>Docker Logs</h2>
+      <pre v-if="dockerLogs">{{ dockerLogs }}</pre>
+      <p v-else>Loading Docker logs...</p>
+    </section>
+
+    <section v-if="showUpdateLogs">
+      <h2>Update Logs</h2>
+      <pre v-if="updateLogs">{{ updateLogs }}</pre>
+      <p v-else>Loading Update logs...</p>
+    </section>
   </div>
 </template>
 
@@ -19,47 +30,103 @@ export default {
   name: "App",
   data() {
     return {
-      showLogs: false, // Controls whether logs are displayed
-      logs: "", // Holds the logs fetched from the backend
+      showDockerLogs: false,
+      showUpdateLogs: false,
+      dockerLogs: "",
+      updateLogs: "",
     };
   },
-  watch: {
-    showLogs(newVal) {
-      if (newVal && !this.logs) {
-        this.fetchLogs();
-      }
-    },
-  },
   methods: {
-    fetchLogs() {
+    fetchDockerLogs() {
       fetch("/api/logs")
         .then((response) => response.json())
         .then((data) => {
           if (data.logs) {
-            this.logs = data.logs.join("\n");
+            this.dockerLogs = data.logs.join("\n");
           } else {
-            this.logs = "No logs available.";
+            this.dockerLogs = "No Docker logs available.";
           }
         })
         .catch((error) => {
-          console.error("Error fetching logs:", error);
-          this.logs = "Error fetching logs.";
+          console.error("Error fetching Docker logs:", error);
+          this.dockerLogs = "Error fetching Docker logs.";
         });
+    },
+    fetchUpdateLogs() {
+      fetch("/api/logs/update")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.logs) {
+            this.updateLogs = data.logs.join("\n");
+          } else {
+            this.updateLogs = "No Update logs available.";
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching Update logs:", error);
+          this.updateLogs = "Error fetching Update logs.";
+        });
+    },
+    triggerCommand(command) {
+      fetch("/api/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          alert(data.status || data.error);
+        })
+        .catch((error) => {
+          console.error("Error triggering command:", error);
+          alert("Error triggering command.");
+        });
+    },
+  },
+  watch: {
+    showDockerLogs(newValue) {
+      if (newValue && !this.dockerLogs) {
+        this.fetchDockerLogs();
+      }
+    },
+    showUpdateLogs(newValue) {
+      if (newValue && !this.updateLogs) {
+        this.fetchUpdateLogs();
+      }
     },
   },
 };
 </script>
 
 <style>
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+nav {
+  margin-bottom: 20px;
+}
+button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #0056b3;
+}
 pre {
-  background-color: #f9f9f9;
+  background: #f4f4f4;
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 15px;
   overflow: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
-}
-nav {
-  margin-bottom: 10px;
 }
 </style>
