@@ -65,6 +65,11 @@ def trigger_command():
         logger.error(f"Error executing command: {e}")
         return jsonify({"error": str(e)}), 500
 
+# Serve Favicon
+@app.route("/assets/<path:filename>")
+def serve_assets(filename):
+    return send_from_directory(os.path.join(os.getcwd(), 'assets'), filename)
+
 # Serve Frontend Files
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")

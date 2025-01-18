@@ -4,12 +4,21 @@ FROM node:18-slim AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Copy package.json and install dependencies
-COPY frontend/package.json ./
+# Copy package.json and package-lock.json and install dependencies
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
+
+# Install TailwindCSS and its dependencies
+RUN npm install tailwindcss postcss autoprefixer
+
+# Generate the TailwindCSS configuration
+RUN npx tailwindcss init
 
 # Copy all frontend source files
 COPY frontend ./
+
+# Copy favicon from the assets directory to the public directory for the build
+COPY assets/favicon_32x32.ico ./public/favicon_32x32.ico
 
 # Build production-ready frontend assets
 RUN npm run build
@@ -33,6 +42,9 @@ RUN groupadd -g 1000 dockster && \
 # Copy backend files
 COPY backend /app/backend
 
+# Copy the frontend build artifacts from Stage 1
+COPY --from=frontend-builder /app/frontend/dist /app/backend/static
+
 # Create the backend logs directory
 RUN mkdir -p /app/backend/logs && \
     touch /app/backend/logs/app.log && \
@@ -43,28 +55,21 @@ RUN python3 -m ensurepip --upgrade && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir -r /app/backend/requirements.txt gunicorn
 
-# Copy the update script into the container
-COPY scripts/update_script.sh /usr/local/bin/update_script.sh
-
-# Make the update script executable
-RUN chmod +x /usr/local/bin/update_script.sh
-
-# Create logs directory for script outputs
-RUN mkdir -p /srv/logs && \
-    touch /srv/logs/update.log /srv/logs/error.log && \
-    chown -R dockster:dockster /srv/logs
+# Copy the favicon into a centralized assets directory
+COPY assets/favicon_32x32.ico /app/assets/favicon_32x32.ico
 
 # Copy Nginx configuration
 COPY scripts/nginx.conf /etc/nginx/sites-available/default
 RUN [ ! -L /etc/nginx/sites-enabled/default ] || rm /etc/nginx/sites-enabled/default && \
     ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Copy the frontend build artifacts from Stage 1
-COPY --from=frontend-builder /app/frontend/dist /app/backend/static
-
 # Copy entrypoint script
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Copy the update script into the container
+COPY scripts/update_script.sh /usr/local/bin/update_script.sh
+RUN chmod +x /usr/local/bin/update_script.sh
 
 # Copy health check script
 COPY scripts/healthcheck.sh /usr/local/bin/healthcheck.sh

@@ -10,15 +10,20 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "axios": "^1.5.0",
-    "vue": "^3.3.4",
+    "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
+    "@vue/compiler-sfc": "^3.5.13",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-plugin-vue": "^9.15.1"
+    "eslint-plugin-vue": "^9.15.1",
+    "file-loader": "^6.2.0",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17"
   },
   "browserslist": [
     "> 1%",

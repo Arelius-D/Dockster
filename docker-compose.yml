@@ -1,16 +1,16 @@
 services:
-  dockster:  # Service name
-    image: assarelius/dockster:latest  # Pull the latest image from Docker Hub
-    container_name: dockster
+  dockster:
+    image: assarelius/dockster:latest  # Use the latest image of Dockster from Docker Hub or local registry
+    container_name: dockster          # Name the container "dockster"
     environment:
-      PUID: 1000  # Default user ID on many Linux systems
-      PGID: 1000  # Default group ID on many Linux systems
+      PUID: 1000  # User ID for file ownership, default user ID on many Linux systems
+      PGID: 1000  # Group ID for file ownership, default group ID on many Linux systems
 
       # Set the following environment variables to "true" to enable respective commands:
-      ENABLE_UPDATE: "true"                  # Perform apt update
-      ENABLE_UPGRADE: "true"                 # Perform apt full-upgrade
-      ENABLE_AUTOREMOVE: "true"              # Remove unused packages
-      ENABLE_CLEAN: "true"                   # Clean package cache
+      ENABLE_UPDATE: "true"                  # Perform `apt update` within the container
+      ENABLE_UPGRADE: "true"                 # Perform `apt full-upgrade` for package updates
+      ENABLE_AUTOREMOVE: "true"              # Remove unnecessary packages from the system
+      ENABLE_CLEAN: "true"                   # Clean up package cache to save space
       ENABLE_DOCKER_CONTAINER_PRUNE: "true"  # Remove stopped Docker containers
       ENABLE_DOCKER_IMAGE_PRUNE: "true"      # Remove unused Docker images
       ENABLE_DOCKER_SYSTEM_PRUNE: "true"     # Perform full Docker cleanup (containers, images, volumes)
@@ -18,14 +18,14 @@ services:
 
     volumes:
       # Allow the container to perform system-level updates and manage Docker on the host
-      - /var/run/docker.sock:/var/run/docker.sock # Mount the Docker socket to the container
-      - ./backend/logs:/app/backend/logs  # Mount the logs directory to the host
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for Docker commands within the container
+      - ./backend/logs:/app/backend/logs          # Map backend logs from the container to the host system
 
     ports:
-      - 1010:1010  # Expose the web interface on port 1010
+      - 1010:1010  # Map port 1010 on the host to port 1010 in the container for the web interface
 
-    restart: unless-stopped
+    restart: unless-stopped  # Restart the container unless explicitly stopped
 
-    # Uncomment the following lines to use environment variables from a .env file:
+    # Uncomment the following lines to use environment variables from a `.env` file:
     # env_file:
-    #   - .env
+    #   - .env  # Path to a .env file for environment variables
